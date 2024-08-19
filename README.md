@@ -9,7 +9,6 @@ This repository contains automated tests for verifying the functionality of the 
 - ChromeDriver
 - pytest
 
-`pip install -r requirements.txt`
 
 **Install Dependencies**
 
@@ -21,9 +20,9 @@ Ensure you have ChromeDriver installed and its path added to your system's envir
 
 **Run the Tests**
 
-To run the tests, execute the following command in the terminal:
+To generate an HTML report using pytest-html, run the following command in your terminal:
 
-`pytest`
+`pytest --html=report.html --self-contained-html`
 
 Test Scenarios
 
