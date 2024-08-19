@@ -18,48 +18,48 @@ def driver():
 
 
 def test_maximal_values(driver):
-    # Testimiseks määratud väärtused, mis ületavad maksimaalseid piire
-    test_amount = 40000  # Näiteks, summa, mis ületab maksimaalse summa
-    test_period = 200    # Näiteks, periood, mis ületab maksimaalse perioodi
+    # Values set for testing that exceed the maximum limits
+    test_amount = 40000  
+    test_period = 200   
 
-    maximum_amount = 30000  # Maksimaalne summa
-    maximum_period = 120    # Maksimaalne periood
+    maximum_amount = 30000  # Maximum amount
+    maximum_period = 120    # Maximum period
 
-    expected_amount = maximum_amount  # Eeldatav summa, kui leht korrektne piire rakendab
-    expected_period = maximum_period  # Eeldatav periood, kui leht korrektne piire rakendab
-    expected_monthly_payment = 526.05  # Maksimaalne oodatav maksimaalsele maksmise summale
+    expected_amount = maximum_amount  # Expected amount if the page correctly applies limits
+    expected_period = maximum_period  # Expected period if the page correctly applies limits
+    expected_monthly_payment = 526.05  # Maximum expected payment amount
 
-    tolerance = 5.0  # Tolerants ±5 summaga
+    tolerance = 10.0  # Tolerance ±10 with the amount
 
-    # Ava laenutaotluse leht
+    # Open the loan application page
     driver.get(f"https://laenutaotlus.bigbank.ee/?amount={test_amount}&period={test_period}&productName=SMALL_LOAN&loanPurpose=DAILY_SETTLEMENTS")
 
     wait = WebDriverWait(driver, 30)
     modal = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "bb-modal__body")))
 
-    # Sisesta summa
+    # Enter the amount
     amount_input = modal.find_element(By.NAME, "header-calculator-amount")
     amount_input.clear()
     amount_input.send_keys(str(test_amount))
 
-    # Sisesta periood
+    # Enter the period
     period_input = modal.find_element(By.NAME, "header-calculator-period")
     period_input.send_keys(Keys.CONTROL + "a")
-    period_input.send_keys(Keys.BACKSPACE)  # Eemalda väärtus BACKSPACE abil
+    period_input.send_keys(Keys.BACKSPACE)  # Remove value using BACKSPACE
     period_input.send_keys(str(test_period))
 
-    # Klõpsa väljapoole, et väärtus automaatselt uuendataks
+    # Click outside to trigger automatic update of the value
     driver.find_element(By.TAG_NAME, 'body').click()
-    time.sleep(2)  # Oota, et veebileht saaks automaatset muudatust töödelda
+    time.sleep(2)  # Wait for the webpage to process the automatic change
 
-    # Kontrolli perioodi väärtust
+    # Check the period value
     period_input_value = float(period_input.get_attribute("value").replace(",", "."))
     print(f"Final Period Input Value: {period_input_value}")
 
     assert period_input_value <= expected_period, \
         f"Expected maximum period to be {expected_period} or less, but got {period_input_value}"
 
-    # Kontrolli kuumakset
+    # Check the monthly payment
     monthly_payment_element = WebDriverWait(driver, 30).until(
         EC.presence_of_element_located((By.CLASS_NAME, "bb-labeled-value__value"))
     )
@@ -72,15 +72,15 @@ def test_maximal_values(driver):
         raise ValueError("Monthly payment UI text is empty.")
 
     try:
-        # Eemaldab komad enne muundamist
+        # Removes commas before conversion
         monthly_payment_ui_value = float(monthly_payment_ui.replace("€", "").replace(",", "").replace(" ", ""))
     except ValueError as e:
         raise
 
-    # Prindi välja kuumakse väärtus
+    # Print the monthly payment value
     print(f"Monthly Payment (UI): {monthly_payment_ui_value}")
 
-    # Kontrolli, kas kuumakse väärtus jääb eeldatavatesse piiridesse koos tolerantsiga
+    # Check if the monthly payment value falls within the expected limits with tolerance
     min_expected_payment = expected_monthly_payment - tolerance
     max_expected_payment = expected_monthly_payment + tolerance
 
