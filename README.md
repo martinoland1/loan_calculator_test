@@ -9,7 +9,6 @@ This repository contains automated tests for verifying the functionality of the 
 - ChromeDriver
 - pytest
 
-`pip install -r requirements.txt`
 
 **Install Dependencies**
 
